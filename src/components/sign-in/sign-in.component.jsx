@@ -30,6 +30,8 @@ const SignIn = () => {
   };
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
+
     try {
       const { user } = await signInAuthUserWithEmailAndPassword(
         email,
@@ -102,8 +104,7 @@ const SignIn = () => {
           <Button buttonAttributes={{ type: "submit" }}>Sign In</Button>
           <Button
             buttonType="google"
-            buttonAttributes={{ type: "button" }}
-            onClick={signInGoogleUser}
+            buttonAttributes={{ type: "button", onClick: signInGoogleUser }}
           >
             Google Sign In
           </Button>
