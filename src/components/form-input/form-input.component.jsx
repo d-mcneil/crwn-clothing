@@ -19,11 +19,12 @@ const FormInput = ({ label = "", inputAttributes }) => {
   );
 };
 
+// Another way of doing the FormInput component which is less explicit within the component about the attributes that are being passed.
 // const FormInput = ({ label = "", id = undefined, ...inputAttributes }) => {
 //     return (
 //       <div className="form-input-group">
+//
 //         <input className="form-input" id={id} {...inputAttributes}></input>
-
 //         {label && (
 //           <label
 //             className={`${

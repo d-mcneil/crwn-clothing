@@ -26,34 +26,28 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // confirm that password matches
-    // see if we have authenticated that user
-    // create user document
+
     switch (true) {
       case password.length < 6:
-        return alert(
-          "Error creating user: password must be 6 characters or longer."
-        );
+        alert("Error creating user: password must be 6 characters or longer.");
+        break;
       case password !== confirmPassword:
-        return alert("Error creating user: passwords do not match.");
-      // return;
+        alert("Error creating user: passwords do not match.");
+        break;
       default:
         // prettier-ignore
-        console.log('trying')
         try {
-          const { user } = await createAuthUserWithEmailAndPassword(
-            email,
-            password
-          );
-          const userDocRef = await createUserDocumentFromAuth(user, {
-            displayName,
-          });
+          const { user } = await createAuthUserWithEmailAndPassword(email, password);
+          const userDocRef = await createUserDocumentFromAuth(user, { displayName });
           setFormFields(initialStateFormFields);
         } catch (error) {
-          if (error.code === "auth/email-already-in-use") {
-            alert("Error creating user: email is already in use.");
+          switch (error.code) {
+            case "auth/email-already-in-use":
+              alert("Error creating the user: email is already in use.");
+              break;
+            default:
+              console.log("Error creating the user: ", error.message);
           }
-          console.log(error);
         }
     }
   };
@@ -61,7 +55,9 @@ const SignUp = () => {
   return (
     <div className="sign-up-container">
       <h2>Don't have an account?</h2>
-      <span>Sign Up with Your Email and Password</span>
+      <span>
+        Sign up with your email and password (or sign in with Google).
+      </span>
       <form onSubmit={handleSubmit}>
         <FormInput
           label={"Display Name"}
@@ -109,7 +105,9 @@ const SignUp = () => {
             minLength: 6,
           }}
         />
-        {/* <FormInput
+        {/* 
+        // Another way of doing the FormInput component which is less explicit within the component about the attributes that are being passed.
+        <FormInput 
           label="Password"
           required
           type="password"
@@ -118,7 +116,8 @@ const SignUp = () => {
           onChange={handleChange}
           id="password-sign-up"
           minLength={6}
-        /> */}
+        /> 
+        */}
         <Button buttonAttributes={{ type: "submit" }}>Sign Up</Button>
       </form>
     </div>
