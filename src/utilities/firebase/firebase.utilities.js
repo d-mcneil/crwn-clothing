@@ -8,6 +8,8 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
@@ -26,21 +28,36 @@ import firebaseConfig from "./firebaseConfig.utilities"; // follows the pattern 
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const auth = getAuth(); // persists between refreshes
+const db = getFirestore();
+
+export const createAuthUserWithEmailAndPassword = (email, password) => {
+  if (!email || !password) return;
+  return createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInAuthUserWithEmailAndPassword = (email, password) => {
+  if (!email || !password) return;
+  return signInWithEmailAndPassword(auth, email, password);
+};
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
-export const auth = getAuth();
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
+
 // export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
 // This would reinitialize the entire application, so any functions that were being executed won't be executed anymore.
 
-export const db = getFirestore();
+export const signOutUser = () => signOut(auth);
 
-export const createUserDocumentFromAuth = async (
+export const onAuthStateChangeListener = (callback) =>
+  onAuthStateChanged(auth, callback);
+
+export const createUserDocumentFromAuthIfDoesNotExist = async (
   userAuth,
   additionalInformation = {}
 ) => {
@@ -53,13 +70,13 @@ export const createUserDocumentFromAuth = async (
     userAuth.uid // unique identifier
   );
 
-  const userSnapshot = await getDoc(userDocRef);
-  // points to a specific spot in a collection WHETHER OR NOT THAT DATA EXISTS
+  try {
+    // points to a specific spot in a collection WHETHER OR NOT THAT DATA EXISTS
+    const userSnapshot = await getDoc(userDocRef);
 
-  // check to see if there is an instance within the collection for this user or not
-  if (!userSnapshot.exists()) {
-    // if there is not an instance (document) within the collection, set one
-    try {
+    // check to see if there is an instance within the collection for this user or not
+    if (!userSnapshot.exists()) {
+      // if there is not an instance (document) within the collection, set one
       const { displayName, email } = userAuth;
       const createdAt = new Date();
       await setDoc(userDocRef, {
@@ -70,20 +87,11 @@ export const createUserDocumentFromAuth = async (
         // if creating a user via email, displayName is not included in the userAuth object
         // then, displayName would be null, so that null will be overwritten when displayName is included in additionalInformation
       });
-    } catch (error) {
-      console.log("Error creating the user: ", error.message);
     }
+  } catch (error) {
+    console.log("Error creating the user: ", error.message);
+    return null;
   }
 
   return userDocRef;
-};
-
-export const createAuthUserWithEmailAndPassword = async (email, password) => {
-  if (!email || !password) return;
-  return createUserWithEmailAndPassword(auth, email, password);
-};
-
-export const signInAuthUserWithEmailAndPassword = async (email, password) => {
-  if (!email || !password) return;
-  return signInWithEmailAndPassword(auth, email, password);
 };

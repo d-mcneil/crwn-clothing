@@ -7,7 +7,7 @@
 import { useState } from "react";
 import {
   signInWithGooglePopup,
-  createUserDocumentFromAuth,
+  // createUserDocumentFromAuth,
   signInAuthUserWithEmailAndPassword,
 } from "../../utilities/firebase/firebase.utilities";
 import Button from "../button/button.component";
@@ -33,11 +33,12 @@ const SignIn = () => {
     event.preventDefault();
 
     try {
-      const { user } = await signInAuthUserWithEmailAndPassword(
-        email,
-        password
-      );
-      const userDocRef = await createUserDocumentFromAuth(user);
+      // const { user } = await signInAuthUserWithEmailAndPassword(
+      //   email,
+      //   password
+      // );
+      // const userDocRef = await createUserDocumentFromAuth(user);
+      await signInAuthUserWithEmailAndPassword(email, password);
       setFormFields(initialStateFormFields);
     } catch (error) {
       switch (error.code) {
@@ -65,8 +66,9 @@ const SignIn = () => {
 
   const signInGoogleUser = async () => {
     try {
-      const { user } = await signInWithGooglePopup();
-      const userDocRef = await createUserDocumentFromAuth(user);
+      // const { user } = await signInWithGooglePopup();
+      // const userDocRef = await createUserDocumentFromAuth(user);
+      await signInWithGooglePopup();
       setFormFields(initialStateFormFields);
     } catch (error) {
       console.log("Error signing in the user: ", error.message);

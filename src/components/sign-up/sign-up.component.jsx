@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   createAuthUserWithEmailAndPassword,
-  createUserDocumentFromAuth,
+  createUserDocumentFromAuthIfDoesNotExist,
 } from "../../utilities/firebase/firebase.utilities";
 import FormInput from "../form-input/form-input.component";
 import "./sign-up.styles.scss";
@@ -38,7 +38,7 @@ const SignUp = () => {
         // prettier-ignore
         try {
           const { user } = await createAuthUserWithEmailAndPassword(email, password);
-          const userDocRef = await createUserDocumentFromAuth(user, { displayName });
+          const userDocRef = await createUserDocumentFromAuthIfDoesNotExist(user, { displayName });
           setFormFields(initialStateFormFields);
         } catch (error) {
           switch (error.code) {
